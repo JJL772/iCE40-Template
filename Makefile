@@ -4,6 +4,8 @@ YOSYS?=yosys
 NEXTPNR?=nextpnr-ice40 
 ICEPROG?=iceprog
 ICEPACK?=icepack
+IVERILOG?=iverilog
+VVP?=vvp
 
 # Libdirs, feel free to add more to this
 LIBDIRS+=$(shell find rtl -type d) $(shell find sim -type d) 
@@ -23,9 +25,10 @@ TOPMOD=top
 
 # TOP file for the simulation
 TOPSIM=src/sim/sim.v 
+SIM_MODULES=sim
 
 # Constraints file
-CONSTRAINTS=constraints.pcf 
+CONSTRAINTS=scripts/constraints/constraints.pcf 
 
 # Sources
 SRCS_RTL+=$(wildcard rtl/*.v)
@@ -38,6 +41,12 @@ YOSYS_SRCS_RTL:=$(addsuffix ;,$(SRCS_RTL))
 YOSYS_SRCS_RTL:=$(addprefix read_verilog $(LIBDIRS_YOSYS) ,$(YOSYS_SRCS_RTL))
 PNR_ARGS=
 OUTFILE:=$(strip $(OUTFILE))
+RAWSIM_MODULES:=$(SIM_MODULES)
+OUTSIM_MODULES:=$(addsuffix .out,$(SIM_MODULES))
+OUTSIM_MODULES:=$(addprefix $(BUILD)/,$(OUTSIM_MODULES))
+SIM_MODULES:=$(addsuffix .v,$(SIM_MODULES))
+SIM_MODULES:=$(addprefix sim/,$(SIM_MODULES))
+VCD_FILES:=$(addprefix $(BUILD)/,$(addsuffix .vcd,$(RAWSIM_MODULES)))
 
 ifeq ($(DEVICE),ICE40LP384)
 	PNR_ARGS=--lp384 
@@ -76,22 +85,44 @@ clean:
 build_dir:
 	mkdir -p build 
 
-.PHONY: clean build_dir all 
+show_settings:
+	@echo "==== General Settings ===="
+	@echo PROJECT=$(PROJECT)
+	@echo BUILD=$(BUILD)
+	@echo OUTFILE=$(OUTFILE)
+	@echo DEVICE=$(DEVICE)
+	@echo SRCS_RTL=$(SRCS_RTL)
+	@echo TOPMOD=$(TOPMOD)
+	@echo TOPFILE=$(TOPFILE)
+	@echo SIM_MODULES=$(SIM_MODULES)
+	@echo PROG_DEVICE=$(PROG_DEVICE)
+	@echo "==== Programs ===="
+	@echo YOSYS=$(YOSYS)
+	@echo NEXTPNR=$(NEXTPNR)
+	@echo ICEPACK=$(ICEPACK)
+	@echo ICETIME=$(ICETIME)
+	@echo IVERILOG=$(IVERILOG)
+	@echo VVP=$(VVP)
+
+.PHONY: clean build_dir all show_settings 
 
 # Synthesis step using yosys 
 $(BUILD)/$(OUTFILE).json: 
-	echo -e "==== Synthesis With yosys ===="
+	@echo -e "==== Synthesis With yosys ===="
+	@mkdir -p $(BUILD)
 	$(YOSYS) -p '$(YOSYS_SRCS_RTL) synth_ice40 -top $(TOPMOD) -json $(BUILD)/$(OUTFILE).json'  
 
 # Place and route 
 $(BUILD)/$(OUTFILE).asc: $(BUILD)/$(OUTFILE).json 
-	echo -e "==== Place & Route With nextpnr-ice40 ===="
+	@echo -e "==== Place & Route With nextpnr-ice40 ===="
+	@mkdir -p $(BUILD) 
 	$(NEXTPNR) $(PNR_ARGS) --json $(BUILD)/$(OUTFILE).json --pcf $(CONSTRAINTS) \
 		--asc $(BUILD)/$(OUTFILE).asc --top $(TOPMOD)
 
 # Pack into bitstream
 $(BUILD)/$(OUTFILE).bin: $(BUILD)/$(OUTFILE).asc 
-	echo -e "==== Bitstream Generation with icepack ===="
+	@echo -e "==== Bitstream Generation with icepack ===="
+	@mkdir -p $(BUILD) 
 	$(ICEPACK) $(BUILD)/$(OUTFILE).asc $(BUILD)/$(OUTFILE).bin
 
 # The bitstream itself 
@@ -99,5 +130,20 @@ bitstream: build_dir $(BUILD)/$(OUTFILE).bin
 
 # Program
 program: $(BUILD)/$(OUTFILE).bin 
+	@mkdir -p $(BUILD) 
 	$(ICEPROG) $(BUILD)/$(OUTFILE).bin -d$(PROG_DEVICE)
 
+$(BUILD)/%.out: sim/%.v
+	@mkdir -p $(BUILD)
+	$(IVERILOG) $(LIBDIRS_YOSYS) -o $@ $< 
+
+$(BUILD)/%.vcd: $(BUILD)/%.out
+	@mkdir -p $(BUILD)
+	cd $(BUILD) && $(VVP) $(subst $(BUILD)/,,$<)
+
+sim: $(OUTSIM_MODULES) $(VCD_FILES)
+
+# Rule to archive the simulation files 
+archive-sim: sim
+	@echo -e "==== Archiving simulation files ===="
+	tar -cf "$(BUILD)/Simulation-$(shell date +%b-%d-%Y-%I-%m%p).tgz" $(wildcard build/*.vcd)

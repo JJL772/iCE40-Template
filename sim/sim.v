@@ -23,4 +23,11 @@
 module sim(
     );
 
+    reg clk; 
+    initial begin
+            $dumpfile("sim.vcd");
+            $dumpvars(0,clk);
+    end 
+    
+
 endmodule
