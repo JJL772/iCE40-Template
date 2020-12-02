@@ -1,0 +1,55 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Create Module",
+			"type": "shell",
+			"command": "./create-module.sh ${input:moduleName}",
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Synthesis",
+			"type": "shell",
+			"command": "make elaborate",
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Place and Route",
+			"type": "shell",
+			"command": "make pnr",
+			"problemMatcher": []
+		},
+		{
+			"label": "Generate Schematic",
+			"type": "shell",
+			"command": "make schematic",
+			"problemMatcher": []
+		},
+		{
+			"label": "Generate Bitstream",
+			"type": "shell",
+			"command": "make bitstream",
+			"problemMatcher": []
+		},
+		{
+			"label": "Program Device",
+			"type": "shell",
+			"command": "make program",
+			"problemMatcher": []
+		},
+		{
+			"label": "Simulate All",
+			"type": "shell",
+			"command": "make sim",
+			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "moduleName",
+			"description": "Name of the module to create",
+			"default": "myModule",
+			"type": "promptString"
+		},
+	]
+}
