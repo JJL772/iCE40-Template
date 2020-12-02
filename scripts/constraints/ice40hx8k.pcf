@@ -1,0 +1,114 @@
+# NOTE: this is not generic for the ice40hx8k, only for the board I'm using
+# Clock 100mz  
+set_io clk P7
+
+# Reset signal
+set_io reset P8
+
+# USD signals
+set_io usb_rxd M9
+set_io usb_txd P14
+
+# On board LEDs 
+set_io led[0] J11
+set_io led[1] K11
+set_io led[2] K12
+set_io led[3] K14
+set_io led[4] L12
+set_io led[5] L14
+set_io led[6] M12
+set_io led[7] N14
+
+set_io ice_cdone M10
+set_io ice_creset L10
+set_io ice_mosi M11 
+set_io ice_miso P11
+set_io ice_sck P12 
+set_io ice_ss P13
+
+# Board I'm using has 79 IOs organized into banks A, B, C & D
+
+# Generic IOs (bank A)
+set_io bankA[0] M1 # IOL23N 2
+set_io bankA[1] L1 # IOL23P 3
+set_io bankA[2] J1 # IOL12N 5
+set_io bankA[3] J3 # IOL12P  6
+set_io bankA[4] G1 # IOL13N 8
+set_io bankA[5]	G3 # IOL13P 9
+set_io bankA[6] E1 # IOL5N 11
+set_io bankA[7] D1 # IOL5P 12
+set_io bankA[8] C1 # IOL2N 14
+set_io bankA[9] B1 # IOL2P 15
+set_io bankA[10] D3 # IOL4N 17
+set_io bankA[11] C3 # IOL4P  18
+set_io bankA[12] A1 # IOT225 20
+set_io bankA[13] A2 # IOT223  21
+set_io bankA[14] A3 # IOT222 23
+set_io bankA[15] A4 # IOT219 24
+set_io bankA[16] A5 # IOT208 27
+set_io bankA[17] C5 # IOT212 28
+set_io bankA[18] D5 # IOT211 30
+set_io bankA[19] C4 # IOT221 31
+set_io bankA[20] D4 # IOL8P 33
+set_io bankA[21] E4 # IOL8N 34
+set_io bankA[22] F4 # IOL9P 36
+set_io bankA[23] F3 # IOL9N 37
+set_io bankA[24] H4 # IOL10P 39
+set_io bankA[25] G4 # IOL10N 40
+set_io bankA[26] H1 # IOL14P 42
+set_io bankA[27] H3 # IOL14N  43
+set_io bankA[28] K3 # IOL18P  45
+set_io bankA[29] K4 # IOL18N  46
+set_io bankA[30] N1 # IOL25P 48
+set_io bankA[31] P1 # IOL25N 49 
+
+# Generic IOs (bank B)
+set_io bankB[0] A6	# IOT198GBIN0 2
+set_io bankB[1] A7	# IOT197GBIN1 3
+set_io bankB[2] A10	# IOT181 5
+set_io bankB[3] A11	# IOT179 6
+set_io bankB[4] C9	# IOT190 8
+set_io bankB[5] C10	# IOT186 9
+set_io bankB[6] A12	# IOT170 11
+set_io bankB[7] B14	# IOR161 12
+set_io bankB[8] C14	# IOR154 14
+set_io bankB[9] D14	# IOR152 15
+set_io bankB[10] E14	# IOR148 17
+set_io bankB[11] E12	# IOR147 18
+set_io bankB[12] F14	# IOR140GBIN3 20
+set_io bankB[13] G14	# IOR141GBIN2 21
+set_io bankB[14] H12	# IOR120 23
+set_io bankB[15] J12	# IOR118 24
+set_io bankB[16] H11	# IOR128 27
+set_io bankB[17] G11	# IOR136 28
+set_io bankB[18] G12	# IOR129 30
+set_io bankB[19] F12	# IOR137 31
+set_io bankB[20] F11	# IOR144 33
+set_io bankB[21] E11	# IOR146 34
+set_io bankB[22] D12	# IOR160 36
+set_io bankB[23] D11	# IOT178 37
+set_io bankB[24] C12	# IOT172 39
+set_io bankB[25] C11	# IOT174 40
+set_io bankB[26] D10	# IOT177 42
+set_io bankB[27] D9	# IOT188 43
+set_io bankB[28] D7	# IOT202 45
+set_io bankB[29] D6	# IOT207 46
+set_io bankB[30] C7	# IOT200 48
+set_io bankB[31] C6	# IOT206 49 
+
+# Generic IOs (bank C)
+set_io bankC[0] M3	# IOB64 2
+set_io bankC[1] M4	# IOB63 3
+set_io bankC[2] L4	# IOB72 5
+set_io bankC[3] L5	# IOB71 6
+set_io bankC[4] M6	# IOB77 8
+set_io bankC[5] M7	# IOB79 9
+set_io bankC[6] L9	# IOB103 11
+set_io bankC[7] P10	# IOB104 39
+set_io bankC[8] P9	# IOB89 40 
+set_io bankC[9] L8	# IOB87 42
+set_io bankC[10] L6	# IOB78 43
+set_io bankC[11] P5	# IOB74 45
+set_io bankC[12] P4	# IOB73 46
+set_io bankC[13] P3	# IOB59 48
+set_io bankC[14] P2	# IOB56 49
