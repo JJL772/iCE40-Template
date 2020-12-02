@@ -2,6 +2,8 @@
 
 NOTE: This is not ready for use. I'm playing around with this right now.
 
+Testing is done with a ICE40HX8K 
+
 ## Required Software
 
 * A UNIX environment complete with GNU/Make, find and date utilities

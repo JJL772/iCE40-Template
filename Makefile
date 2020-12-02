@@ -15,7 +15,7 @@ OUTFILE=$(PROJECT)
 BUILD=build
 
 # Device you're targeting
-DEVICE=ICE40LP384 
+DEVICE=ICE40HX8K
 
 # Device to program
 PROG_DEVICE=
@@ -29,7 +29,7 @@ TOPSIM=src/sim/sim.v
 SIM_MODULES=sim
 
 # Constraints file
-CONSTRAINTS=scripts/constraints/constraints.pcf 
+CONSTRAINTS=scripts/constraints/ice40hx8k.pcf
 
 # Sources
 SRCS_RTL+=$(wildcard rtl/*.v)
