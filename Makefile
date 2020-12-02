@@ -9,6 +9,7 @@ VVP?=vvp
 
 # Libdirs, feel free to add more to this
 LIBDIRS+=$(shell find rtl -type d) $(shell find sim -type d) 
+
 # Output file/build dir
 OUTFILE=$(PROJECT)
 BUILD=build
@@ -32,6 +33,7 @@ CONSTRAINTS=scripts/constraints/constraints.pcf
 
 # Sources
 SRCS_RTL+=$(wildcard rtl/*.v)
+SRCS_SIM+=$(wildcard sim/*.v)
 
 #
 # Avoid editing below here
@@ -112,12 +114,27 @@ $(BUILD)/$(OUTFILE).json:
 	@mkdir -p $(BUILD)
 	$(YOSYS) -p '$(YOSYS_SRCS_RTL) synth_ice40 -top $(TOPMOD) -json $(BUILD)/$(OUTFILE).json'  
 
+$(BUILD)/modules/%.json: $(SRCS_RTL)
+	@mkdir -p $(BUILD)/modules
+	$(YOSYS) -p 'read -sv $< ; prep -top $(notdir $(subst .v,,$<)) -flatten ; write_json $@'
+
+$(BUILD)/modules/%.svg: $(BUILD)/modules/%.json
+	@mkdir -p $(BUILD)/modules
+	netlistsvg $< -o $@
+
+# Generates a schematic for each module in RTL/
+schematic: $(addprefix $(BUILD)/modules/,$(notdir $(SRCS_RTL:.v=.svg)))
+
+synthesis: $(BUILD)/$(OUTFILE).json
+
 # Place and route 
 $(BUILD)/$(OUTFILE).asc: $(BUILD)/$(OUTFILE).json 
 	@echo -e "==== Place & Route With nextpnr-ice40 ===="
 	@mkdir -p $(BUILD) 
 	$(NEXTPNR) $(PNR_ARGS) --json $(BUILD)/$(OUTFILE).json --pcf $(CONSTRAINTS) \
 		--asc $(BUILD)/$(OUTFILE).asc --top $(TOPMOD)
+
+pnr: build_dir $(BUILD)/$(OUTFILE).asc
 
 # Pack into bitstream
 $(BUILD)/$(OUTFILE).bin: $(BUILD)/$(OUTFILE).asc 
@@ -147,3 +164,7 @@ sim: $(OUTSIM_MODULES) $(VCD_FILES)
 archive-sim: sim
 	@echo -e "==== Archiving simulation files ===="
 	tar -cf "$(BUILD)/Simulation-$(shell date +%b-%d-%Y-%I-%m%p).tgz" $(wildcard build/*.vcd)
+
+archive: sim schematic
+	@echo -e "==== Archiving files ===="
+	tar -cf "$(BUILD)/Simulation-$(shell date +%b-%d-%Y-%I-%m%p).tgz" $(wildcard build/*.vcd) $(wildcard build/modules/*.svg)
